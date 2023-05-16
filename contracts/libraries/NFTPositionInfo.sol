@@ -2,8 +2,8 @@
 pragma solidity =0.7.6;
 
 import '@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol';
-import '@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol';
-import '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';
+import '@uniswap/v3-core/contracts/interfaces/ITartzFactory.sol';
+import '@uniswap/v3-core/contracts/interfaces/ITartzPool.sol';
 
 import '@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol';
 
@@ -17,14 +17,14 @@ library NFTPositionInfo {
     /// @return tickUpper The upper tick of the Uniswap V3 position
     /// @return liquidity The amount of liquidity staked
     function getPositionInfo(
-        IUniswapV3Factory factory,
+        ITartzFactory factory,
         INonfungiblePositionManager nonfungiblePositionManager,
         uint256 tokenId
     )
         internal
         view
         returns (
-            IUniswapV3Pool pool,
+            ITartzPool pool,
             int24 tickLower,
             int24 tickUpper,
             uint128 liquidity
@@ -37,7 +37,7 @@ library NFTPositionInfo {
             tokenId
         );
 
-        pool = IUniswapV3Pool(
+        pool = ITartzPool(
             PoolAddress.computeAddress(
                 address(factory),
                 PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})

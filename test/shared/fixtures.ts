@@ -2,8 +2,8 @@ import { Fixture } from 'ethereum-waffle'
 import { constants } from 'ethers'
 import { ethers, waffle } from 'hardhat'
 
-import UniswapV3Pool from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json'
-import UniswapV3FactoryJson from '@uniswap/v3-core/artifacts/contracts/UniswapV3Factory.sol/UniswapV3Factory.json'
+import TartzPool from '@uniswap/v3-core/artifacts/contracts/TartzPool.sol/TartzPool.json'
+import TartzFactoryJson from '@uniswap/v3-core/artifacts/contracts/TartzFactory.sol/TartzFactory.json'
 import NFTDescriptorJson from '@uniswap/v3-periphery/artifacts/contracts/libraries/NFTDescriptor.sol/NFTDescriptor.json'
 import NonfungiblePositionManagerJson from '@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json'
 import NonfungibleTokenPositionDescriptor from '@uniswap/v3-periphery/artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json'
@@ -13,11 +13,11 @@ import { linkLibraries } from './linkLibraries'
 import { ISwapRouter } from '../../types/ISwapRouter'
 import { IWETH9 } from '../../types/IWETH9'
 import {
-  UniswapV3Staker,
+  TartzStaker,
   TestERC20,
   INonfungiblePositionManager,
-  IUniswapV3Factory,
-  IUniswapV3Pool,
+  ITartzFactory,
+  ITartzPool,
   TestIncentiveId,
 } from '../../typechain'
 import { NFTDescriptor } from '../../types/NFTDescriptor'
@@ -35,16 +35,16 @@ export const wethFixture: Fixture<WETH9Fixture> = async ([wallet]) => {
   return { weth9 }
 }
 
-const v3CoreFactoryFixture: Fixture<IUniswapV3Factory> = async ([wallet]) => {
+const v3CoreFactoryFixture: Fixture<ITartzFactory> = async ([wallet]) => {
   return ((await waffle.deployContract(wallet, {
-    bytecode: UniswapV3FactoryJson.bytecode,
-    abi: UniswapV3FactoryJson.abi,
-  })) as unknown) as IUniswapV3Factory
+    bytecode: TartzFactoryJson.bytecode,
+    abi: TartzFactoryJson.abi,
+  })) as unknown) as ITartzFactory
 }
 
 export const v3RouterFixture: Fixture<{
   weth9: IWETH9
-  factory: IUniswapV3Factory
+  factory: ITartzFactory
   router: ISwapRouter
 }> = async ([wallet], provider) => {
   const { weth9 } = await wethFixture([wallet], provider)
@@ -70,7 +70,7 @@ const nftDescriptorLibraryFixture: Fixture<NFTDescriptor> = async ([wallet]) => 
 
 type UniswapFactoryFixture = {
   weth9: IWETH9
-  factory: IUniswapV3Factory
+  factory: ITartzFactory
   router: ISwapRouter
   nft: INonfungiblePositionManager
   tokens: [TestERC20, TestERC20, TestERC20]
@@ -199,14 +199,14 @@ export const mintPosition = async (
 }
 
 export type UniswapFixtureType = {
-  factory: IUniswapV3Factory
+  factory: ITartzFactory
   fee: FeeAmount
   nft: INonfungiblePositionManager
   pool01: string
   pool12: string
-  poolObj: IUniswapV3Pool
+  poolObj: ITartzPool
   router: ISwapRouter
-  staker: UniswapV3Staker
+  staker: TartzStaker
   testIncentiveId: TestIncentiveId
   tokens: [TestERC20, TestERC20, TestERC20]
   token0: TestERC20
@@ -216,8 +216,8 @@ export type UniswapFixtureType = {
 export const uniswapFixture: Fixture<UniswapFixtureType> = async (wallets, provider) => {
   const { tokens, nft, factory, router } = await uniswapFactoryFixture(wallets, provider)
   const signer = new ActorFixture(wallets, provider).stakerDeployer()
-  const stakerFactory = await ethers.getContractFactory('UniswapV3Staker', signer)
-  const staker = (await stakerFactory.deploy(factory.address, nft.address, 2 ** 32, 2 ** 32)) as UniswapV3Staker
+  const stakerFactory = await ethers.getContractFactory('TartzStaker', signer)
+  const staker = (await stakerFactory.deploy(factory.address, nft.address, 2 ** 32, 2 ** 32)) as TartzStaker
 
   const testIncentiveIdFactory = await ethers.getContractFactory('TestIncentiveId', signer)
   const testIncentiveId = (await testIncentiveIdFactory.deploy()) as TestIncentiveId
@@ -235,7 +235,7 @@ export const uniswapFixture: Fixture<UniswapFixtureType> = async (wallets, provi
 
   const pool12 = await factory.getPool(tokens[1].address, tokens[2].address, fee)
 
-  const poolObj = poolFactory.attach(pool01) as IUniswapV3Pool
+  const poolObj = poolFactory.attach(pool01) as ITartzPool
 
   return {
     nft,
@@ -254,4 +254,4 @@ export const uniswapFixture: Fixture<UniswapFixtureType> = async (wallets, provi
   }
 }
 
-export const poolFactory = new ethers.ContractFactory(UniswapV3Pool.abi, UniswapV3Pool.bytecode)
+export const poolFactory = new ethers.ContractFactory(TartzPool.abi, TartzPool.bytecode)

@@ -73,6 +73,9 @@ const config: HardhatUserConfig = {
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
     },
+    alfajores: {
+      url: `https://alfajores-forno.celo-testnet.org`,
+    },
   },
   solidity: {
     compilers: [DEFAULT_COMPILER_SETTINGS],
@@ -89,6 +92,16 @@ if (process.env.ETHERSCAN_API_KEY) {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
     apiKey: process.env.ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: "alfajores",
+        chainId: 44787,
+        urls: {
+          apiURL: "https://api-alfajores.celoscan.io/api",
+          browserURL: "https://alfajores.celoscan.io"
+        }
+      }
+    ],
   }
 }
 

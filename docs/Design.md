@@ -25,7 +25,7 @@ struct Stake {
 State:
 
 ```solidity
-IUniswapV3Factory public immutable factory;
+ITartzFactory public immutable factory;
 INonfungiblePositionManager public immutable nonfungiblePositionManager;
 
 /// @dev bytes32 refers to the return value of IncentiveId.compute
